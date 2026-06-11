@@ -55,7 +55,8 @@ Demo sign-in: `demo@bb-circulars.app` / `demo1234` (configure via `DEMO_USERS`).
 |---|---|---|
 | `AUTH_SECRET` | yes | Auth.js JWT signing secret (`npx auth secret`) |
 | `DEMO_USERS` | yes | `email:password` pairs for the demo credentials provider |
-| `AI_GATEWAY_API_KEY` | recommended | Vercel AI Gateway key — enables AI answers + embeddings |
+| `AI_GATEWAY_API_KEY` | no* | Vercel AI Gateway key — enables AI answers + embeddings |
+| `VERCEL_OIDC_TOKEN` | no* | Auto-provisioned alternative to the key: present on Vercel deployments automatically, locally via `vercel env pull`. *One of the two is needed for AI answers; **AI Gateway also requires a credit card on the Vercel account to unlock its free monthly credits.** Without either, the app serves extractive answers with citations. |
 | `CHAT_MODEL` | no | default `anthropic/claude-sonnet-4.6` |
 | `EMBEDDING_MODEL` | no | default `openai/text-embedding-3-small` |
 | `OCR_SPACE_API_KEY` | for scanned PDFs | free key from [ocr.space/ocrapi](https://ocr.space/ocrapi) |

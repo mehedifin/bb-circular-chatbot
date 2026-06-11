@@ -151,21 +151,27 @@ function chunkPage(docId: string, page: number, text: string): Chunk[] {
 }
 
 async function embedChunks(chunks: Chunk[]) {
-  if (!process.env.AI_GATEWAY_API_KEY) {
-    console.log("Embeddings skipped (no AI_GATEWAY_API_KEY) — BM25 retrieval will be used.");
+  // Gateway auth: explicit key, or the OIDC token from `vercel env pull`.
+  if (!process.env.AI_GATEWAY_API_KEY && !process.env.VERCEL_OIDC_TOKEN) {
+    console.log("Embeddings skipped (no gateway auth) — BM25 retrieval will be used.");
     return;
   }
   const { embedMany } = await import("ai");
   const model = process.env.EMBEDDING_MODEL ?? "openai/text-embedding-3-small";
   const BATCH = 64;
-  for (let i = 0; i < chunks.length; i += BATCH) {
-    const batch = chunks.slice(i, i + BATCH);
-    const { embeddings } = await embedMany({
-      model,
-      values: batch.map((c) => c.text.slice(0, 6000)),
-    });
-    batch.forEach((c, j) => (c.embedding = embeddings[j]));
-    console.log(`  embedded ${Math.min(i + BATCH, chunks.length)}/${chunks.length}`);
+  try {
+    for (let i = 0; i < chunks.length; i += BATCH) {
+      const batch = chunks.slice(i, i + BATCH);
+      const { embeddings } = await embedMany({
+        model,
+        values: batch.map((c) => c.text.slice(0, 6000)),
+      });
+      batch.forEach((c, j) => (c.embedding = embeddings[j]));
+      console.log(`  embedded ${Math.min(i + BATCH, chunks.length)}/${chunks.length}`);
+    }
+  } catch (err) {
+    console.warn(`Embeddings failed (${(err as Error).message}) — continuing with BM25 only.`);
+    for (const c of chunks) delete c.embedding;
   }
 }
 

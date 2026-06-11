@@ -46,3 +46,4 @@ data/raw/
 
 # allow committing the env example
 !.env.example
+.vercel

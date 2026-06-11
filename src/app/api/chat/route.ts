@@ -45,8 +45,8 @@ ${context || "(no relevant excerpts were retrieved)"}`;
 function extractiveFallback(citations: Citation[], lang: "bn" | "en"): string {
   const intro =
     lang === "bn"
-      ? "AI উত্তর তৈরি এখনো কনফিগার করা হয়নি (AI_GATEWAY_API_KEY প্রয়োজন)। আপনার প্রশ্নের সাথে সবচেয়ে প্রাসঙ্গিক সার্কুলার অংশগুলো নিচে দেওয়া হলো:\n\n"
-      : "AI answer generation is not configured yet (AI_GATEWAY_API_KEY required). Here are the most relevant circular excerpts for your question:\n\n";
+      ? "AI উত্তর তৈরি এই মুহূর্তে সক্রিয় নয়। আপনার প্রশ্নের সাথে সবচেয়ে প্রাসঙ্গিক সার্কুলার অংশগুলো নিচে দেওয়া হলো:\n\n"
+      : "AI answer generation is not active right now. Here are the most relevant circular excerpts for your question:\n\n";
   const body = citations
     .slice(0, 3)
     .map(
@@ -92,7 +92,9 @@ export async function POST(req: Request) {
         return;
       }
 
-      if (!process.env.AI_GATEWAY_API_KEY) {
+      // Gateway auth: an explicit key, or the OIDC token Vercel provisions
+      // automatically on deployments (and via `vercel env pull` locally).
+      if (!process.env.AI_GATEWAY_API_KEY && !process.env.VERCEL_OIDC_TOKEN) {
         writeText(extractiveFallback(citations, lang));
         return;
       }
@@ -112,7 +114,9 @@ export async function POST(req: Request) {
     },
     onError: (error) => {
       console.error("chat stream error:", error);
-      return "Sorry, something went wrong while generating the answer. Please try again.";
+      // If the gateway rejects the call (e.g. billing not unlocked yet),
+      // degrade to the extractive answer instead of a bare error.
+      return extractiveFallback(citations, lang);
     },
   });
 
