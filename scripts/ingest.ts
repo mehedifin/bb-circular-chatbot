@@ -85,7 +85,10 @@ async function ocrSpacePdf(
   try {
     const form = new FormData();
     form.append("apikey", apiKey);
-    form.append("language", language);
+    // OCR.space engine 1 has no Bengali model ("E201 invalid language");
+    // engine 2 auto-detects the language, so omit the parameter for Bangla.
+    if (language === "eng") form.append("language", language);
+    form.append("OCREngine", "2");
     form.append("isOverlayRequired", "false");
     form.append("filetype", "PDF");
     form.append("file", new Blob([new Uint8Array(buffer)], { type: "application/pdf" }), "doc.pdf");
