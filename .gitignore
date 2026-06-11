@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ingestion artifacts (large; index.json + circulars.json are committed for the demo)
+data/pdfs/
+data/raw/
+
+# allow committing the env example
+!.env.example
