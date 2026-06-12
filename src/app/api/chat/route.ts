@@ -92,9 +92,16 @@ export async function POST(req: Request) {
         return;
       }
 
-      // Gateway auth: an explicit key, or the OIDC token Vercel provisions
-      // automatically on deployments (and via `vercel env pull` locally).
-      if (!process.env.AI_GATEWAY_API_KEY && !process.env.VERCEL_OIDC_TOKEN) {
+      // Gateway auth: an explicit key, the OIDC token from `vercel env pull`
+      // (local dev), or any Vercel runtime — there the SDK obtains the OIDC
+      // token from the request context, not from an env var. Auth failures
+      // still degrade to the extractive answer via onError below.
+      const hasGatewayAuth = Boolean(
+        process.env.AI_GATEWAY_API_KEY ||
+          process.env.VERCEL_OIDC_TOKEN ||
+          process.env.VERCEL,
+      );
+      if (!hasGatewayAuth) {
         writeText(extractiveFallback(citations, lang));
         return;
       }

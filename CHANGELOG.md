@@ -4,6 +4,13 @@ All notable changes to the BB Circular Assistant are documented here.
 Versioning follows [SemVer](https://semver.org): every push to `master` bumps the
 version in `package.json`, adds an entry below, and is tagged `vX.Y.Z` in git.
 
+## v0.4.1 — 2026-06-12
+
+- Fix: on Vercel deployments the OIDC token reaches functions via the request
+  context (not the `VERCEL_OIDC_TOKEN` env var), so the chat route now attempts
+  gateway generation whenever it runs on Vercel and lets the extractive
+  fallback handle genuine auth failures. AI answers now work in production.
+
 ## v0.4.0 — 2026-06-12
 
 - AI answers enabled in production: AI Gateway unlocked (free tier), chat model
