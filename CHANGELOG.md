@@ -4,6 +4,17 @@ All notable changes to the BB Circular Assistant are documented here.
 Versioning follows [SemVer](https://semver.org): every push to `master` bumps the
 version in `package.json`, adds an entry below, and is tagged `vX.Y.Z` in git.
 
+## v0.4.0 — 2026-06-12
+
+- AI answers enabled in production: AI Gateway unlocked (free tier), chat model
+  set to `anthropic/claude-haiku-4.5` via `CHAT_MODEL` (the free tier does not
+  include Claude Sonnet; switch `CHAT_MODEL` back after upgrading to paid
+  credits for unrestricted access).
+- Embeddings remain off — the free tier rate-limits `openai/text-embedding-3-small`
+  too aggressively for ingestion, so retrieval stays BM25-only. Re-run
+  `npm run ingest` after upgrading to add hybrid (vector) retrieval.
+- Index rebuilt (16 docs, 166 chunks).
+
 ## v0.3.0 — 2026-06-12
 
 - AI Gateway auth now accepts `AI_GATEWAY_API_KEY` **or** Vercel's auto-provisioned
